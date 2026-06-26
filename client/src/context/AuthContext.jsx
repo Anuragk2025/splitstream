@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 const AuthContext = createContext(null);
 
@@ -11,7 +12,9 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/auth/me');
+      const res = await fetch(`${API_URL}/api/auth/me`, {
+        credentials: 'include',
+      });
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
@@ -33,10 +36,11 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setError(null);
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
       });
 
       const data = await res.json();
@@ -56,10 +60,11 @@ export const AuthProvider = ({ children }) => {
   const signup = async (name, email, password) => {
     setError(null);
     try {
-      const res = await fetch('/api/auth/signup', {
+      const res = await fetch(`${API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
+        credentials: 'include',
       });
 
       const data = await res.json();
@@ -78,12 +83,16 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
       setUser(null);
     } catch (err) {
       console.error('Logout error:', err);
     }
   };
+
 
   return (
     <AuthContext.Provider value={{ user, loading, error, login, signup, logout, checkAuth }}>

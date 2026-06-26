@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { API_URL } from '../config';
 
 const SocketContext = createContext(null);
 
@@ -22,13 +23,14 @@ export const SocketProvider = ({ children }) => {
     }
 
     // Connect socket
-    const socketInstance = io('/', {
+    const socketInstance = io(API_URL, {
       // Send credentials for httpOnly cookie authentication
       withCredentials: true,
       autoConnect: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
     });
+
 
     socketInstance.on('connect', () => {
       console.log('Socket.io connected:', socketInstance.id);

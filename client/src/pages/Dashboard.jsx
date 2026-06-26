@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { API_URL } from '../config';
 import { 
   Wallet, Plus, LogOut, ArrowRight, UserPlus, Users, 
   TrendingUp, TrendingDown, RefreshCw, Bell, Check, Trash
@@ -34,7 +35,9 @@ function Dashboard() {
     if (!silent) setLoading(true);
     else setRefreshing(true);
     try {
-      const res = await fetch('/api/groups');
+      const res = await fetch(`${API_URL}/api/groups`, {
+        credentials: 'include',
+      });
       if (res.ok) {
         const data = await res.json();
         setGroups(data.groups);
@@ -62,10 +65,11 @@ function Dashboard() {
     try {
       setCreating(true);
       setCreateError('');
-      const res = await fetch('/api/groups', {
+      const res = await fetch(`${API_URL}/api/groups`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newGroupName }),
+        credentials: 'include',
       });
 
       const data = await res.json();
@@ -89,10 +93,11 @@ function Dashboard() {
     try {
       setJoining(true);
       setJoinError('');
-      const res = await fetch('/api/groups/join', {
+      const res = await fetch(`${API_URL}/api/groups/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inviteCode: inviteCode.toUpperCase() }),
+        credentials: 'include',
       });
 
       const data = await res.json();

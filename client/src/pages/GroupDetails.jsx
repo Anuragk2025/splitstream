@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { API_URL } from '../config';
 import AddExpenseModal from '../components/AddExpenseModal';
 import SettleUpModal from '../components/SettleUpModal';
 import { 
@@ -47,7 +48,9 @@ function GroupDetails() {
   const fetchGroupDetails = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const res = await fetch(`/api/groups/${groupId}`);
+      const res = await fetch(`${API_URL}/api/groups/${groupId}`, {
+        credentials: 'include',
+      });
       const data = await res.json();
 
       if (res.ok) {
@@ -70,7 +73,9 @@ function GroupDetails() {
 
   const fetchActivityFeed = async () => {
     try {
-      const res = await fetch(`/api/groups/${groupId}/activity`);
+      const res = await fetch(`${API_URL}/api/groups/${groupId}/activity`, {
+        credentials: 'include',
+      });
       if (res.ok) {
         const data = await res.json();
         setActivityFeed(data.activities);
@@ -136,12 +141,13 @@ function GroupDetails() {
   // Save Expense Handler (Create/Edit)
   const handleSaveExpense = async (expenseData) => {
     const isEdit = !!expenseData.id;
-    const url = isEdit ? `/api/expenses/${expenseData.id}` : '/api/expenses';
+    const url = isEdit ? `${API_URL}/api/expenses/${expenseData.id}` : `${API_URL}/api/expenses`;
     const method = isEdit ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         groupId,
         amount: expenseData.amount,
@@ -167,8 +173,9 @@ function GroupDetails() {
     if (!window.confirm('Are you sure you want to delete this expense?')) return;
 
     try {
-      const res = await fetch(`/api/expenses/${expenseId}`, {
+      const res = await fetch(`${API_URL}/api/expenses/${expenseId}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       const data = await res.json();
       if (res.ok) {
@@ -184,9 +191,10 @@ function GroupDetails() {
 
   // Save Settlement Handler
   const handleSaveSettlement = async (settlementData) => {
-    const res = await fetch('/api/settlements', {
+    const res = await fetch(`${API_URL}/api/settlements`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         groupId,
         toUserId: settlementData.toUserId,
