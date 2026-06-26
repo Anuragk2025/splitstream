@@ -9,17 +9,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'splitstream-jwt-secret-key-12345';
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Helper to sign JWT and set cookie
-const setAuthCookie = (res, user) => {
+const setAuthCookie = (req, res, user) => {
   const token = jwt.sign(
     { id: user.id, email: user.email, name: user.name },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
 
+  // Auto-detect secure connection (Render/Vercel use HTTPS proxy)
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+
   res.cookie('token', token, {
     httpOnly: true,
-    secure: isProduction, // secure in production
-    sameSite: isProduction ? 'none' : 'lax', // cross-site cookie settings
+    secure: isSecure,
+    sameSite: isSecure ? 'none' : 'lax', // cross-site cookie settings
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 };
@@ -55,7 +58,7 @@ router.post('/signup', async (req, res) => {
       },
     });
 
-    setAuthCookie(res, user);
+    setAuthCookie(req, res, user);
 
     return res.status(201).json({
       user: {
@@ -94,7 +97,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password.' });
     }
 
-    setAuthCookie(res, user);
+    setAuthCookie(req, res, user);
 
     return res.status(200).json({
       user: {

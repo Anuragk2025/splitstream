@@ -23,7 +23,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'splitstream-jwt-secret-key-12345';
 
 // Configure CORS
 app.use(cors({
-  origin: CLIENT_URL,
+  origin: (origin, callback) => {
+    // Allow any origin dynamically to support local and hosted clients
+    callback(null, true);
+  },
   credentials: true,
 }));
 
