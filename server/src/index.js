@@ -30,6 +30,15 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Welcome to the SplitStream API!',
+    status: 'healthy',
+    documentation: 'https://github.com/Anuragk2025/splitstream'
+  });
+});
+
 // Base health check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date() });
